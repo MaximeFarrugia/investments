@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+    restart: unless-stopped
+
+  openbb:
+    build: ./openbb
+    ports:
+      - "6900:6900"
+    volumes:
+      - openbb_data:/root/.openbb_platform
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  openbb_data:
