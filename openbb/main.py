@@ -117,7 +117,12 @@ filters = {
     # },
 }
 
-client = MongoClient(env["MONGO_URI"], username=env["MONGO_USER"], password=env["MONGO_PASS"])
+client = MongoClient(
+    host=env["MONGO_HOST"],
+    port=env["MONGO_PORT"],
+    username=env["MONGO_USER"],
+    password=env["MONGO_PASS"],
+)
 db = client[env["MONGO_DB"]]
 
 def merge_lists(list1, list2):
