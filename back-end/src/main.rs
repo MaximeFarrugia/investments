@@ -1,17 +1,39 @@
 mod error;
+mod middlewares;
 mod users;
 
 use anyhow::Context;
+
+use crate::error::AppResult;
 
 #[derive(Clone)]
 pub struct AppState {
     pub db: mongodb::Client,
 }
 
+pub trait Model {
+    const COLLECTION_NAME: &'static str;
+
+    fn get_collection(state: &AppState) -> AppResult<mongodb::Collection<Self>>
+    where
+        Self: Send + Sync + Sized,
+    {
+        Ok(state
+            .db
+            .default_database()
+            .context("Get default database")?
+            .collection::<Self>(Self::COLLECTION_NAME))
+    }
+}
+
 fn init_router(state: AppState) -> axum::Router {
     axum::Router::new()
-        .nest("/users", users::init_router())
-        .with_state(state)
+        .nest("/users", users::init_router(state.clone()))
+        .with_state(state.clone())
+        .layer(axum::middleware::from_fn_with_state(
+            state,
+            middlewares::base,
+        ))
 }
 
 #[tokio::main]

@@ -1,5 +1,6 @@
 use anyhow::Context;
 use axum::{Json, extract::State, http::StatusCode};
+use axum_extra::extract::{CookieJar, cookie::Cookie};
 use chrono::Duration;
 use mongodb::bson::{doc, uuid};
 use scrypt::{
@@ -9,7 +10,7 @@ use scrypt::{
 use serde::Deserialize;
 
 use crate::{
-    AppState,
+    AppState, Model,
     error::AppResult,
     users::models::{AuthToken, User},
 };
@@ -20,22 +21,13 @@ pub struct LoginPayload {
     password: String,
 }
 
-#[derive(serde::Serialize)]
-pub struct LoginResponse {
-    token: String,
-    expires_at: chrono::DateTime<chrono::Utc>,
-}
-
 pub async fn handler(
     State(state): State<AppState>,
+    jar: CookieJar,
     Json(payload): Json<LoginPayload>,
-) -> AppResult<Json<LoginResponse>> {
-    let database = state
-        .db
-        .default_database()
-        .context("Get default database")?;
-    let users_collection = database.collection::<User>("users");
-    let tokens_collection = database.collection::<AuthToken>("auth_tokens");
+) -> AppResult<CookieJar> {
+    let users_collection = User::get_collection(&state)?;
+    let tokens_collection = AuthToken::get_collection(&state)?;
 
     let user = users_collection
         .find_one(doc! { "email": &payload.email })
@@ -93,9 +85,11 @@ pub async fn handler(
     }
     let token = token.unwrap();
 
-    Ok(LoginResponse {
-        token: token.token,
-        expires_at: token.expires_at,
-    }
-    .into())
+    Ok(jar.add(
+        Cookie::build(("auth_token", token.token))
+            .path("/")
+            .http_only(true)
+            .secure(true)
+            .build(),
+    ))
 }

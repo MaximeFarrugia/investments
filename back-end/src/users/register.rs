@@ -7,7 +7,7 @@ use scrypt::{
 };
 use serde::Deserialize;
 
-use crate::{AppState, error::AppResult, users::models::User};
+use crate::{error::AppResult, users::models::User, AppState, Model};
 
 #[derive(Deserialize)]
 pub struct RegisterPayload {
@@ -19,11 +19,7 @@ pub async fn handler(
     State(state): State<AppState>,
     Json(payload): Json<RegisterPayload>,
 ) -> AppResult<()> {
-    let collection = state
-        .db
-        .default_database()
-        .context("Get default database")?
-        .collection::<User>("users");
+    let collection = User::get_collection(&state)?;
 
     if payload.email.is_empty() {
         return Err(

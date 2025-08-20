@@ -2,6 +2,8 @@ use mongodb::bson::oid::ObjectId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
+use crate::Model;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub _id: ObjectId,
@@ -12,6 +14,10 @@ pub struct User {
     pub open_positions: Vec<OpenPosition>,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl Model for User {
+    const COLLECTION_NAME: &'static str = "users";
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -35,4 +41,8 @@ pub struct AuthToken {
     pub token: String,
     pub expires_at: chrono::DateTime<chrono::Utc>,
     pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl Model for AuthToken {
+    const COLLECTION_NAME: &'static str = "auth_tokens";
 }
