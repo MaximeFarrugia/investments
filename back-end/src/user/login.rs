@@ -10,9 +10,7 @@ use scrypt::{
 use serde::Deserialize;
 
 use crate::{
-    AppState, Model,
-    error::AppResult,
-    users::models::{AuthToken, User},
+    error::AppResult, middlewares::AUTH_TOKEN_COOKIE_NAME, user::models::{AuthToken, User}, AppState, Model
 };
 
 #[derive(Deserialize)]
@@ -86,7 +84,7 @@ pub async fn handler(
     let token = token.unwrap();
 
     Ok(jar.add(
-        Cookie::build(("auth_token", token.token))
+        Cookie::build((AUTH_TOKEN_COOKIE_NAME, token.token))
             .path("/")
             .http_only(true)
             .secure(true)

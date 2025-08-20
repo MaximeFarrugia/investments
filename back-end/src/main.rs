@@ -1,6 +1,6 @@
 mod error;
 mod middlewares;
-mod users;
+mod user;
 
 use anyhow::Context;
 
@@ -28,7 +28,7 @@ pub trait Model {
 
 fn init_router(state: AppState) -> axum::Router {
     axum::Router::new()
-        .nest("/users", users::init_router(state.clone()))
+        .nest("/user", user::init_router(state.clone()))
         .with_state(state.clone())
         .layer(axum::middleware::from_fn_with_state(
             state,

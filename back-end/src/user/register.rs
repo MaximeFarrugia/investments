@@ -7,7 +7,7 @@ use scrypt::{
 };
 use serde::Deserialize;
 
-use crate::{error::AppResult, users::models::User, AppState, Model};
+use crate::{error::AppResult, user::models::User, AppState, Model};
 
 #[derive(Deserialize)]
 pub struct RegisterPayload {

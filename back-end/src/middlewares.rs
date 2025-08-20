@@ -12,13 +12,15 @@ use mongodb::bson::doc;
 use crate::{
     AppState, Model,
     error::{AppError, AppResult},
-    users::models::AuthToken,
+    user::models::AuthToken,
 };
 
 #[derive(Clone)]
 pub struct UserContext {
     pub user_id: Option<mongodb::bson::oid::ObjectId>,
 }
+
+pub const AUTH_TOKEN_COOKIE_NAME: &str = "auth_token";
 
 pub async fn base(
     State(state): State<AppState>,
@@ -28,7 +30,7 @@ pub async fn base(
     let mut jar = CookieJar::from_headers(&request.headers());
     let mut context = UserContext { user_id: None };
 
-    if let Some(token) = jar.get("auth_token").map(|x| x.value()) {
+    if let Some(token) = jar.get(AUTH_TOKEN_COOKIE_NAME).map(|x| x.value()) {
         let tokens_collection = AuthToken::get_collection(&state)?;
         if let Some(token) = tokens_collection
             .find_one(doc! { "token": token })
@@ -38,7 +40,7 @@ pub async fn base(
             if token.expires_at > chrono::Utc::now() {
                 context.user_id = Some(token.user_id);
             } else {
-                jar = jar.remove("auth_token");
+                jar = jar.remove(AUTH_TOKEN_COOKIE_NAME);
                 return Ok((
                     jar,
                     AppError::ProblemDetails(
