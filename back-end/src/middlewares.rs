@@ -6,7 +6,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use axum_extra::extract::CookieJar;
+use axum_extra::extract::{CookieJar, cookie::Cookie};
 use mongodb::bson::doc;
 
 use crate::{
@@ -27,7 +27,7 @@ pub async fn base(
     mut request: Request,
     next: Next,
 ) -> AppResult<Response> {
-    let mut jar = CookieJar::from_headers(&request.headers());
+    let jar = CookieJar::from_headers(&request.headers());
     let mut context = UserContext { user_id: None };
 
     if let Some(token) = jar.get(AUTH_TOKEN_COOKIE_NAME).map(|x| x.value()) {
@@ -40,9 +40,8 @@ pub async fn base(
             if token.expires_at > chrono::Utc::now() {
                 context.user_id = Some(token.user_id);
             } else {
-                jar = jar.remove(AUTH_TOKEN_COOKIE_NAME);
                 return Ok((
-                    jar,
+                    jar.remove(Cookie::from(AUTH_TOKEN_COOKIE_NAME)),
                     AppError::ProblemDetails(
                         problem_details::ProblemDetails::from_status_code(StatusCode::UNAUTHORIZED)
                             .with_title("Token expired")

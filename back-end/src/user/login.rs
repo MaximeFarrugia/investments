@@ -8,9 +8,13 @@ use scrypt::{
     password_hash::{PasswordHash, PasswordVerifier},
 };
 use serde::Deserialize;
+use time::OffsetDateTime;
 
 use crate::{
-    error::AppResult, middlewares::AUTH_TOKEN_COOKIE_NAME, user::models::{AuthToken, User}, AppState, Model
+    AppState, Model,
+    error::AppResult,
+    middlewares::AUTH_TOKEN_COOKIE_NAME,
+    user::models::{AuthToken, User},
 };
 
 #[derive(Deserialize)]
@@ -56,38 +60,29 @@ pub async fn handler(
     }
 
     let now = chrono::Utc::now();
-    let token = tokens_collection
-        .insert_one(AuthToken {
-            _id: mongodb::bson::oid::ObjectId::new(),
-            user_id: user._id,
-            token: uuid::Uuid::new().to_string(),
-            expires_at: now
-                .checked_add_signed(Duration::hours(1))
-                .context("Failed to calculate token expiration")?,
-            created_at: now,
-        })
+    let token = AuthToken {
+        id: None,
+        user_id: user.id.context("User ID is missing")?,
+        token: uuid::Uuid::new().to_string(),
+        expires_at: now
+            .checked_add_signed(Duration::hours(1))
+            .context("Failed to calculate token expiration")?,
+        created_at: now,
+    };
+    tokens_collection
+        .insert_one(&token)
         .await
         .context("Failed to create auth token")?;
-    let token = tokens_collection
-        .find_one(doc! { "_id": token.inserted_id })
-        .await
-        .context("Failed to retrieve auth token")?
-        .ok_or_else(|| {
-            problem_details::ProblemDetails::from_status_code(StatusCode::INTERNAL_SERVER_ERROR)
-                .with_title("Token not found")
-                .with_detail("Failed to retrieve the created auth token.")
-        });
-
-    if let Err(err) = token {
-        return Err(err.into());
-    }
-    let token = token.unwrap();
 
     Ok(jar.add(
         Cookie::build((AUTH_TOKEN_COOKIE_NAME, token.token))
             .path("/")
             .http_only(true)
             .secure(true)
+            .expires(
+                OffsetDateTime::from_unix_timestamp(token.expires_at.timestamp())
+                    .context("Failed to convert expiration time")?,
+            )
             .build(),
     ))
 }

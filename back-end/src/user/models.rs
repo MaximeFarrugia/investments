@@ -2,11 +2,12 @@ use mongodb::bson::oid::ObjectId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use crate::Model;
+use crate::{portfolio::models::OpenPosition, Model};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
-    pub _id: ObjectId,
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
     pub email: String,
     pub password: String,
     pub last_password_update: chrono::DateTime<chrono::Utc>,
@@ -28,15 +29,9 @@ pub struct CashFlow {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct OpenPosition {
-    pub symbol: String,
-    pub quantity: Decimal,
-    pub cost_price: Decimal,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct AuthToken {
-    pub _id: ObjectId,
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
     pub user_id: ObjectId,
     pub token: String,
     pub expires_at: chrono::DateTime<chrono::Utc>,

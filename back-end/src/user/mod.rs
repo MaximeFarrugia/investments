@@ -1,5 +1,5 @@
-mod login;
 pub mod models;
+mod login;
 mod register;
 
 use axum::routing::post;

@@ -1,6 +1,8 @@
 mod error;
 mod middlewares;
+mod pagination;
 mod user;
+mod portfolio;
 
 use anyhow::Context;
 
@@ -29,6 +31,7 @@ pub trait Model {
 fn init_router(state: AppState) -> axum::Router {
     axum::Router::new()
         .nest("/user", user::init_router(state.clone()))
+        .nest("/portfolio", portfolio::init_router(state.clone()))
         .with_state(state.clone())
         .layer(axum::middleware::from_fn_with_state(
             state,

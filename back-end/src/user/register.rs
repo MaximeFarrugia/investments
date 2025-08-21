@@ -63,16 +63,17 @@ pub async fn handler(
         .context("Failed to hash password")?
         .to_string();
 
+    let now = chrono::Utc::now();
     let _ = collection
         .insert_one(User {
-            _id: mongodb::bson::oid::ObjectId::new(),
+            id: None,
             email: payload.email,
             password: password_hash,
-            last_password_update: chrono::Utc::now(),
+            last_password_update: now,
             cash_flow: vec![],
             open_positions: vec![],
-            created_at: chrono::Utc::now(),
-            updated_at: chrono::Utc::now(),
+            created_at: now,
+            updated_at: now,
         })
         .await
         .context("Failed to create user")?;
