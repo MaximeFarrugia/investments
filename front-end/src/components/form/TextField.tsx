@@ -12,7 +12,7 @@ const TextField = ({ label, placeholder }: Props) => {
 
   return (
     <div className="grid gap-2">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className="px-1">{label}</Label>
       <Input
         id={field.name}
         placeholder={placeholder}

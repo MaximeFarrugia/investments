@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { type ObjectId } from '.'
 
 interface LoginPayload {
   email: string
@@ -11,11 +10,10 @@ export const login = (payload: LoginPayload) => {
 }
 
 export interface User {
-  _id: ObjectId
+  id: string
   email: string
   password: string
   last_password_update: string
-  // cash_flow: Vec<CashFlow>,
   created_at: string
   updated_at: string
 }

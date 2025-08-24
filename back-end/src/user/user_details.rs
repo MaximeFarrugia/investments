@@ -3,11 +3,11 @@ use axum::{Extension, Json, extract::State, http::StatusCode};
 use mongodb::bson::doc;
 use serde::Serialize;
 
-use crate::{AppState, Model, error::AppResult, middlewares::UserContext, user::models::User};
+use crate::{error::AppResult, middlewares::UserContext, user::{dto, models::User}, AppState, Model};
 
 #[derive(Serialize)]
 pub struct UserDetailsResponse {
-    pub user: User,
+    pub user: dto::User,
 }
 
 pub async fn handler(
@@ -32,6 +32,6 @@ pub async fn handler(
     }
 
     Ok(Json(UserDetailsResponse {
-        user: user.unwrap(),
+        user: user.unwrap().into(),
     }))
 }

@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Route } from '.'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getDividends } from '@/api/portfolio'
 import ApiError from '@/components/ApiError'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   ChartContainer,
   ChartTooltip,
@@ -17,40 +24,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import DatePicker from '@/components/DatePicker'
+import { Label } from '@/components/ui/label'
 
 const Dividends = () => {
   const { account_id } = Route.useParams()
   const [currency, setCurrency] = useState('')
-  const {
-    data,
-    error,
-    isPending,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['dividends', account_id],
-    queryFn: async ({ pageParam }) => {
-      return await getDividends(account_id, { offset: pageParam, limit: 20 })
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => {
-      return lastPage.data.pagination.has_next
-        ? lastPage.data.pagination.offset + lastPage.data.pagination.limit
-        : undefined
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().getFullYear(), 0),
+  )
+  const [endDate, setEndDate] = useState(
+    new Date(new Date().getFullYear() + 1, 0),
+  )
+  const { data, error, isPending } = useQuery({
+    queryKey: ['dividends', account_id, startDate, endDate],
+    queryFn: async () => {
+      return await getDividends(account_id, {
+        start_date: startDate,
+        end_date: endDate,
+      })
     },
   })
 
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  const dividends = useMemo(
-    () => data?.pages.flatMap((e) => e.data.dividends) ?? [],
-    [data],
-  )
+  const dividends = useMemo(() => data?.data.dividends ?? [], [data])
 
   const symbols = useMemo(
     () =>
@@ -103,6 +99,22 @@ const Dividends = () => {
     setCurrency(max.currency)
   }, [dividends, currencies, setCurrency])
 
+  const totalDividends: Record<string, number> = useMemo(
+    () =>
+      currencies.reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr]: Math.round(
+            dividends
+              .filter((d) => d.currency === curr)
+              .reduce((acc1, curr1) => acc1 + parseFloat(curr1.amount), 0),
+          ),
+        }),
+        {},
+      ),
+    [dividends, currencies],
+  )
+
   if (isPending) return <p>Loading Dividends...</p>
 
   if (error) return <ApiError error={error} />
@@ -111,18 +123,43 @@ const Dividends = () => {
     <Card className="h-fit flex-1">
       <CardHeader>
         <CardTitle>Dividends</CardTitle>
-        <Select onValueChange={setCurrency} value={currency}>
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Currency" />
-          </SelectTrigger>
-          <SelectContent>
-            {currencies.map((e) => (
-              <SelectItem key={e} value={e}>
-                {e}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <CardDescription className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="currency" className="px-1">
+              Currency
+            </Label>
+            <Select onValueChange={setCurrency} value={currency}>
+              <SelectTrigger id="currency" className="w-[100px]">
+                <SelectValue placeholder="Currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies.map((e) => (
+                  <SelectItem key={e} value={e}>
+                    {e}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DatePicker
+            label="Start date"
+            date={startDate}
+            onSelect={(date) => {
+              if (date) {
+                setStartDate(date)
+              }
+            }}
+          />
+          <DatePicker
+            label="End date"
+            date={endDate}
+            onSelect={(date) => {
+              if (date) {
+                setEndDate(date)
+              }
+            }}
+          />
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={{}} className="min-h-[200px] w-full">
@@ -143,6 +180,13 @@ const Dividends = () => {
           </ComposedChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter>
+        <CardDescription className="flex flex-col gap-2 items-center w-full">
+          {Object.entries(totalDividends).map(([k, v]) => (
+            <span key={k}>{`${k}: ${v}`}</span>
+          ))}
+        </CardDescription>
+      </CardFooter>
     </Card>
   )
 }

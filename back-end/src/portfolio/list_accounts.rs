@@ -12,12 +12,12 @@ use crate::{
     error::AppResult,
     middlewares::UserContext,
     pagination::{Pagination, PaginationData},
-    portfolio::models::PortfolioAccount,
+    portfolio::{dto, models::PortfolioAccount},
 };
 
 #[derive(Serialize)]
 pub struct ListAccountsResponse {
-    pub accounts: Vec<PortfolioAccount>,
+    pub accounts: Vec<dto::PortfolioAccount>,
     pub pagination: PaginationData,
 }
 
@@ -41,7 +41,10 @@ pub async fn handler(
         .context("Failed to list accounts")?
         .try_collect::<Vec<PortfolioAccount>>()
         .await
-        .context("Failed to collect accounts")?;
+        .context("Failed to collect accounts")?
+        .iter()
+        .map(dto::PortfolioAccount::from)
+        .collect();
 
     Ok(Json(ListAccountsResponse {
         accounts,

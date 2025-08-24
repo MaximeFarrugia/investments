@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.99"
 axum = "0.8.4"
 axum-extra = { version = "0.10.1", features = ["cookie", "multipart"] }
+bson = { version = "2.15.0", features = ["chrono", "chrono-0_4"] }
 chrono = { version = "0.4.41", features = ["serde"] }
 dotenvy = "0.15.7"
 futures-util = "0.3.31"

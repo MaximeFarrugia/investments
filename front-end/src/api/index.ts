@@ -16,7 +16,3 @@ export interface PaginationData {
   has_next: boolean
   has_prev: boolean
 }
-
-export interface ObjectId {
-  $oid: string
-}

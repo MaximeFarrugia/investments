@@ -1,16 +1,16 @@
 import axios from 'axios'
-import { type PaginationData, type Pagination, type ObjectId } from '.'
+import { type PaginationData, type Pagination } from '.'
 
 export interface ListAccountsResponse {
   accounts: Account[]
   pagination: PaginationData
 }
 
-export type Platform = 'IBKR'
+export type Platform = '"IBKR"'
 
 export interface Account {
-  _id: ObjectId
-  user_id: ObjectId
+  id: string
+  user_id: string
   name: string
   platform: Platform
   base_currency: string
@@ -24,14 +24,34 @@ export const listAccounts = (pagination: Pagination) => {
   })
 }
 
+export interface NewAccountPayload {
+  platform: Platform
+  file: File
+}
+
+export interface NewAccountResponse {
+  account_id: string
+}
+
+export const newAccount = (account: NewAccountPayload) => {
+  const formData = new FormData()
+  formData.append('platform', account.platform)
+  formData.append('file', account.file)
+  return axios.post<NewAccountResponse>('/api/portfolio/accounts', formData, {
+    headers: {
+      'content-type': 'multipart/form-data',
+    },
+  })
+}
+
 export interface OpenPositionsResponse {
   open_positions: OpenPosition[]
   pagination: PaginationData
 }
 
 export interface OpenPosition {
-  _id: ObjectId
-  account_id: ObjectId
+  id: string
+  account_id: string
   symbol: string
   quantity: string
   cost_price: string
@@ -50,25 +70,30 @@ export const getOpenPositions = (
   )
 }
 
+export interface DividendsQuery {
+  start_date: Date
+  end_date: Date
+}
+
 export interface DividendsResponse {
   dividends: Dividend[]
   pagination: PaginationData
 }
 
 export interface Dividend {
-  _id: ObjectId
-  account_id: ObjectId
+  id: string
+  account_id: string
   symbol: string
   date: string
   amount: string
   currency: string
 }
 
-export const getDividends = (account_id: string, pagination: Pagination) => {
+export const getDividends = (account_id: string, query: DividendsQuery) => {
   return axios.get<DividendsResponse>(
     `/api/portfolio/accounts/${account_id}/dividends`,
     {
-      params: pagination,
+      params: query,
     },
   )
 }

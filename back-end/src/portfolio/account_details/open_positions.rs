@@ -8,15 +8,12 @@ use mongodb::bson::{doc, oid::ObjectId};
 use serde::Serialize;
 
 use crate::{
-    AppState, Model,
-    error::AppResult,
-    pagination::{Pagination, PaginationData},
-    portfolio::models::OpenPosition,
+    error::AppResult, pagination::{Pagination, PaginationData}, portfolio::{dto, models::OpenPosition}, AppState, Model
 };
 
 #[derive(Serialize)]
 pub struct OpenPositionsResponse {
-    pub open_positions: Vec<OpenPosition>,
+    pub open_positions: Vec<dto::OpenPosition>,
     pub pagination: PaginationData,
 }
 
@@ -40,7 +37,10 @@ pub async fn handler(
         .context("Failed to list open positions")?
         .try_collect::<Vec<OpenPosition>>()
         .await
-        .context("Failed to collect open positions")?;
+        .context("Failed to collect open positions")?
+        .iter()
+        .map(dto::OpenPosition::from)
+        .collect();
 
     Ok(Json(OpenPositionsResponse {
         open_positions,

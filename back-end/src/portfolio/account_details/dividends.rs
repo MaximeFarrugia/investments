@@ -5,51 +5,49 @@ use axum::{
 };
 use futures_util::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     AppState, Model,
     error::AppResult,
-    pagination::{Pagination, PaginationData},
-    portfolio::models::Dividend,
+    portfolio::{dto, models::Dividend},
 };
+
+#[derive(Deserialize)]
+pub struct DividendsQuery {
+    start_date: chrono::DateTime<chrono::Utc>,
+    end_date: chrono::DateTime<chrono::Utc>,
+}
 
 #[derive(Serialize)]
 pub struct DividendsResponse {
-    pub dividends: Vec<Dividend>,
-    pub pagination: PaginationData,
+    pub dividends: Vec<dto::Dividend>,
 }
 
 pub async fn handler(
     State(state): State<AppState>,
     Path(account_id): Path<ObjectId>,
-    Query(pagination): Query<Pagination>,
+    Query(query): Query<DividendsQuery>,
 ) -> AppResult<Json<DividendsResponse>> {
     let collection = Dividend::get_collection(&state)?;
-    let filter = doc! { "account_id": account_id };
+    let filter = doc! {
+        "account_id": account_id,
+        "$and": [
+            doc! { "date": doc! { "$gte": query.start_date } },
+            doc! { "date": doc! { "$lt": query.end_date } },
+        ]
+    };
 
-    let total_count = collection
-        .count_documents(filter.clone())
-        .await
-        .context("Failed to count dividends")? as i64;
     let dividends = collection
         .find(filter)
-        .skip(pagination.offset)
-        .limit(pagination.limit)
         .await
         .context("Failed to list dividends")?
         .try_collect::<Vec<Dividend>>()
         .await
-        .context("Failed to collect dividends")?;
+        .context("Failed to collect dividends")?
+        .iter()
+        .map(dto::Dividend::from)
+        .collect();
 
-    Ok(Json(DividendsResponse {
-        dividends,
-        pagination: PaginationData {
-            total_count,
-            offset: pagination.offset,
-            limit: pagination.limit,
-            has_next: total_count > pagination.offset as i64 + pagination.limit,
-            has_prev: pagination.offset > 0,
-        },
-    }))
+    Ok(Json(DividendsResponse { dividends }))
 }

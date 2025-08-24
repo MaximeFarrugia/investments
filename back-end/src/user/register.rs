@@ -70,7 +70,6 @@ pub async fn handler(
             email: payload.email,
             password: password_hash,
             last_password_update: now,
-            cash_flow: vec![],
             created_at: now,
             updated_at: now,
         })

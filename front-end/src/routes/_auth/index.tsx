@@ -1,14 +1,42 @@
 import { type Pagination } from '@/api'
-import { listAccounts, type Account } from '@/api/portfolio'
+import {
+  listAccounts,
+  newAccount,
+  type Account,
+  type NewAccountPayload,
+  type Platform,
+} from '@/api/portfolio'
 import ApiError from '@/components/ApiError'
+import ErrorInfo from '@/components/form/ErrorInfo'
+import SubmitButton from '@/components/form/SubmitButton'
 import TablePagination from '@/components/TablePagination'
+import { Button } from '@/components/ui/button'
 import {
   Card,
+  CardAction,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -17,7 +45,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useQuery } from '@tanstack/react-query'
+import { fieldContext, formContext } from '@/hooks/form_context'
+import { DialogDescription } from '@radix-ui/react-dialog'
+import { createFormHook } from '@tanstack/react-form'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   createColumnHelper,
@@ -43,19 +74,66 @@ const columns = [
   }),
 ]
 
+const { useAppForm } = createFormHook({
+  fieldComponents: {
+    Select,
+    ErrorInfo,
+  },
+  formComponents: {
+    SubmitButton,
+  },
+  fieldContext,
+  formContext,
+})
+
 function RouteComponent() {
   const [accountsPagination, setAccountsPagination] = useState<Pagination>({
     offset: 0,
     limit: 20,
   })
+  const [dialogError, setDialogError] = useState<Error | undefined>()
+  const [dialogVisible, setDialogVisible] = useState(false)
   const navigate = useNavigate()
-  const { isPending, error, data } = useQuery({
+
+  const { isPending, error, data, refetch } = useQuery({
     queryKey: [
       'list_accounts',
       accountsPagination.offset,
       accountsPagination.limit,
     ],
     queryFn: async () => await listAccounts(accountsPagination),
+  })
+
+  const newAccountMutation = useMutation({
+    mutationFn: async (value: NewAccountPayload) => {
+      await newAccount(value)
+    },
+  })
+
+  const form = useAppForm({
+    defaultValues: {
+      platform: '"IBKR"' as Platform,
+      file: null as File | null,
+    },
+    validators: {
+      onChange: z.object({
+        platform: z.enum(['"IBKR"']),
+        file: z.file(),
+      }),
+    },
+    onSubmit: async ({ formApi, value }) => {
+      try {
+        await newAccountMutation.mutateAsync({
+          platform: value.platform!,
+          file: value.file!,
+        })
+        await refetch()
+        formApi.reset()
+        setDialogVisible(false)
+      } catch (err) {
+        setDialogError(err as Error)
+      }
+    },
   })
 
   const table = useReactTable({
@@ -73,6 +151,80 @@ function RouteComponent() {
       <Card>
         <CardHeader>
           <CardTitle>Accounts</CardTitle>
+          <CardAction>
+            <Dialog open={dialogVisible} onOpenChange={setDialogVisible}>
+              <DialogTrigger asChild>
+                <Button>New account</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <form
+                  className="contents"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    form.handleSubmit()
+                  }}
+                >
+                  <DialogHeader>
+                    <DialogTitle>New Account</DialogTitle>
+                    <DialogDescription>
+                      Select platform and file to create new account.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form.AppField
+                    name="platform"
+                    children={(field) => (
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="platform" className="px-1">
+                          Platform
+                        </Label>
+                        <Select
+                          onValueChange={(e) =>
+                            field.handleChange(e as Platform)
+                          }
+                          value={field.state.value}
+                        >
+                          <SelectTrigger id="platform" className="w-full">
+                            <SelectValue placeholder="Platform" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={`"IBKR"`}>IBKR</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <field.ErrorInfo />
+                      </div>
+                    )}
+                  />
+                  <form.AppField
+                    name="file"
+                    children={(field) => (
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="file" className="px-1">
+                          File
+                        </Label>
+                        <Input
+                          id="file"
+                          type="file"
+                          onChange={(e) =>
+                            field.handleChange(e.target.files?.[0] ?? null)
+                          }
+                        />
+                        <field.ErrorInfo />
+                      </div>
+                    )}
+                  />
+                  {!!dialogError && <ApiError error={dialogError!} />}
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <form.AppForm>
+                      <form.SubmitButton label="Submit" />
+                    </form.AppForm>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <Table>
@@ -99,7 +251,7 @@ function RouteComponent() {
                   onClick={() => {
                     navigate({
                       to: '/account/$account_id',
-                      params: { account_id: row.original._id.$oid },
+                      params: { account_id: row.original.id },
                     })
                   }}
                 >

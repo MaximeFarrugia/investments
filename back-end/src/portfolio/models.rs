@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Platform {
     IBKR,
 }
@@ -17,7 +17,9 @@ pub struct PortfolioAccount {
     pub name: String,
     pub platform: Platform,
     pub base_currency: String,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -46,7 +48,8 @@ pub struct Dividend {
     pub id: Option<ObjectId>,
     pub account_id: ObjectId,
     pub symbol: String,
-    pub date: chrono::NaiveDate,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub date: chrono::DateTime<chrono::Utc>,
     pub amount: Decimal,
     pub currency: String,
 }

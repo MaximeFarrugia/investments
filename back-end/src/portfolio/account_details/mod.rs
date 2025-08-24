@@ -11,13 +11,12 @@ use mongodb::bson::{doc, oid::ObjectId};
 use serde::Serialize;
 
 use crate::{
-    AppState, Model, error::AppResult, middlewares::UserContext,
-    portfolio::models::PortfolioAccount,
+    error::AppResult, middlewares::UserContext, portfolio::{dto, models::PortfolioAccount}, AppState, Model
 };
 
 #[derive(Serialize)]
 pub struct AccountDetailsResponse {
-    pub account: PortfolioAccount,
+    pub account: dto::PortfolioAccount,
 }
 
 pub async fn handler(
@@ -43,6 +42,6 @@ pub async fn handler(
     }
 
     Ok(Json(AccountDetailsResponse {
-        account: account.unwrap(),
+        account: account.unwrap().into(),
     }))
 }

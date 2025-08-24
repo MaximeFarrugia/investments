@@ -1,3 +1,4 @@
+pub mod dto;
 mod login;
 pub mod models;
 mod register;

@@ -70,13 +70,21 @@ pub async fn new_account(
     if activity_statement.dividends.0.len() > 0 {
         let collection = Dividend::get_collection(&state)?;
         collection
-            .insert_many(activity_statement.dividends.0.iter().map(|x| Dividend {
-                id: None,
-                account_id: account_id.clone(),
-                symbol: x.symbol.to_owned(),
-                date: x.date,
-                amount: x.amount,
-                currency: x.currency.to_owned(),
+            .insert_many(activity_statement.dividends.0.iter().map(|x| {
+                Dividend {
+                    id: None,
+                    account_id: account_id.clone(),
+                    symbol: x.symbol.to_owned(),
+                    date: x
+                        .date
+                        .and_time(
+                            chrono::NaiveTime::from_hms_opt(0, 0, 0)
+                                .expect("chrono::NaiveTime::from_hms_opt(0, 0, 0) should work"),
+                        )
+                        .and_utc(),
+                    amount: x.amount,
+                    currency: x.currency.to_owned(),
+                }
             }))
             .await
             .context("Failed to create dividends")?;
