@@ -2,7 +2,7 @@ use mongodb::bson::oid::ObjectId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use crate::{portfolio::models::OpenPosition, Model};
+use crate::Model;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -12,7 +12,6 @@ pub struct User {
     pub password: String,
     pub last_password_update: chrono::DateTime<chrono::Utc>,
     pub cash_flow: Vec<CashFlow>,
-    pub open_positions: Vec<OpenPosition>,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }

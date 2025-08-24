@@ -71,7 +71,6 @@ pub async fn handler(
             password: password_hash,
             last_password_update: now,
             cash_flow: vec![],
-            open_positions: vec![],
             created_at: now,
             updated_at: now,
         })

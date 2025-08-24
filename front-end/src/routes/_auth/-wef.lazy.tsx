@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import styled from 'styled-components'
 
-import PriceChart from './components/PriceChart'
-import LineChart from './components/LineChart'
+import PriceChart from '@/components/PriceChart'
+import LineChart from '@/components/LineChart'
 
 interface HistoricalPriceApiResponse {
   results: Array<{
@@ -16,7 +16,7 @@ interface HistoricalPriceApiResponse {
   }>
 }
 
-const Home = () => {
+function RouteComponent() {
   const { isPending, error, data } = useQuery({
     queryKey: ['historical_price'],
     queryFn: async () => {
@@ -174,7 +174,7 @@ const Home = () => {
   )
 }
 
-export default Home
+export default RouteComponent
 
 const Wrapper = styled.div`
   width: 100vw;

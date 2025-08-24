@@ -1,20 +1,26 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createGlobalStyle } from "styled-components"
-
-import Home from "./Home"
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
+import { createGlobalStyle } from 'styled-components'
 
 const queryClient = new QueryClient()
 
-const App = () => {
+const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalStyle />
-      <Home />
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <Outlet />
+        <Toaster position='top-center' theme='system' />
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
 
-export default App
+export const Route = createRootRoute({
+  component: RootComponent,
+})
 
 const GlobalStyle = createGlobalStyle`
   *, *::before, *::after {
