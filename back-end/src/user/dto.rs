@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::user::models;
+use super::models;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {

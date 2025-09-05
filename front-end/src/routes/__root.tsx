@@ -6,13 +6,22 @@ import { createGlobalStyle } from 'styled-components'
 
 const queryClient = new QueryClient()
 
+declare global {
+  interface Window {
+    __TANSTACK_QUERY_CLIENT__:
+      import("@tanstack/query-core").QueryClient;
+  }
+}
+
+window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+
 const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalStyle />
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <Outlet />
-        <Toaster position='top-center' theme='system' />
+        <Toaster position="top-center" theme="system" />
       </ThemeProvider>
     </QueryClientProvider>
   )

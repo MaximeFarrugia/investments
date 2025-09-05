@@ -1,7 +1,7 @@
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use crate::portfolio::models;
+use super::models;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Platform {

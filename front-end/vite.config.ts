@@ -28,6 +28,14 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_BACKEND_URL,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
+        '/openbb': {
+          target: env.VITE_OPENBB_URL,
+          rewrite: (path) => path.replace(/^\/openbb/, ''),
+        },
+        '/edgar': {
+          target: env.VITE_EDGAR_URL,
+          rewrite: (path) => path.replace(/^\/edgar/, ''),
+        },
       },
     },
   }

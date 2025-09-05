@@ -26,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import TablePagination from '@/components/TablePagination'
+import { useNavigate } from '@tanstack/react-router'
 
 const columnHelper = createColumnHelper<OpenPosition>()
 
@@ -53,6 +54,7 @@ const columns = [
 ]
 
 const OpenPositions = () => {
+  const navigate = useNavigate()
   const { account_id } = Route.useParams()
   const [pagination, setPagination] = useState<Pagination>({
     offset: 0,
@@ -103,7 +105,17 @@ const OpenPositions = () => {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                onClick={() =>
+                  navigate({
+                    to: '/analysis/stock',
+                    search: {
+                      symbol: row.original.symbol,
+                    },
+                  })
+                }
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

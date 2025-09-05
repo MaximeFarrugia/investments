@@ -13,6 +13,7 @@ import { Route as UnauthRouteImport } from './routes/_unauth'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as UnauthLoginRouteImport } from './routes/_unauth/login'
+import { Route as AuthAnalysisStockIndexRouteImport } from './routes/_auth/analysis/stock/index'
 import { Route as AuthAccountAccount_idIndexRouteImport } from './routes/_auth/account/$account_id/index'
 
 const UnauthRoute = UnauthRouteImport.update({
@@ -33,6 +34,11 @@ const UnauthLoginRoute = UnauthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => UnauthRoute,
 } as any)
+const AuthAnalysisStockIndexRoute = AuthAnalysisStockIndexRouteImport.update({
+  id: '/analysis/stock/',
+  path: '/analysis/stock/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAccountAccount_idIndexRoute =
   AuthAccountAccount_idIndexRouteImport.update({
     id: '/account/$account_id/',
@@ -44,11 +50,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof UnauthLoginRoute
   '/': typeof AuthIndexRoute
   '/account/$account_id': typeof AuthAccountAccount_idIndexRoute
+  '/analysis/stock': typeof AuthAnalysisStockIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof UnauthLoginRoute
   '/': typeof AuthIndexRoute
   '/account/$account_id': typeof AuthAccountAccount_idIndexRoute
+  '/analysis/stock': typeof AuthAnalysisStockIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -57,12 +65,13 @@ export interface FileRoutesById {
   '/_unauth/login': typeof UnauthLoginRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/account/$account_id/': typeof AuthAccountAccount_idIndexRoute
+  '/_auth/analysis/stock/': typeof AuthAnalysisStockIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/account/$account_id'
+  fullPaths: '/login' | '/' | '/account/$account_id' | '/analysis/stock'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/account/$account_id'
+  to: '/login' | '/' | '/account/$account_id' | '/analysis/stock'
   id:
     | '__root__'
     | '/_auth'
@@ -70,6 +79,7 @@ export interface FileRouteTypes {
     | '/_unauth/login'
     | '/_auth/'
     | '/_auth/account/$account_id/'
+    | '/_auth/analysis/stock/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -107,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthLoginRouteImport
       parentRoute: typeof UnauthRoute
     }
+    '/_auth/analysis/stock/': {
+      id: '/_auth/analysis/stock/'
+      path: '/analysis/stock'
+      fullPath: '/analysis/stock'
+      preLoaderRoute: typeof AuthAnalysisStockIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/account/$account_id/': {
       id: '/_auth/account/$account_id/'
       path: '/account/$account_id'
@@ -120,11 +137,13 @@ declare module '@tanstack/react-router' {
 interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
   AuthAccountAccount_idIndexRoute: typeof AuthAccountAccount_idIndexRoute
+  AuthAnalysisStockIndexRoute: typeof AuthAnalysisStockIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
   AuthAccountAccount_idIndexRoute: AuthAccountAccount_idIndexRoute,
+  AuthAnalysisStockIndexRoute: AuthAnalysisStockIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

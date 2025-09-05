@@ -1,8 +1,9 @@
 mod error;
+mod financial;
 mod middlewares;
 mod pagination;
-mod user;
 mod portfolio;
+mod user;
 
 use anyhow::Context;
 
@@ -32,6 +33,7 @@ fn init_router(state: AppState) -> axum::Router {
     axum::Router::new()
         .nest("/user", user::init_router(state.clone()))
         .nest("/portfolio", portfolio::init_router(state.clone()))
+        .nest("/financial", financial::init_router(state.clone()))
         .with_state(state.clone())
         .layer(axum::middleware::from_fn_with_state(
             state,

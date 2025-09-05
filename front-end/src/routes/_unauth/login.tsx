@@ -43,7 +43,7 @@ function RouteComponent() {
     validators: {
       onChange: z.object({
         email: z.email(),
-        password: z.string().min(1),
+        password: z.string().nonempty(),
       }),
     },
     onSubmit: async ({ value }) => {
