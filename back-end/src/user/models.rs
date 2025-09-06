@@ -1,5 +1,4 @@
 use mongodb::bson::oid::ObjectId;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::Model;
