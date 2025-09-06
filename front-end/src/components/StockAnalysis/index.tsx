@@ -3,6 +3,8 @@ import { stockAnalysisContext } from './context'
 import HistoricalPrice from './HistoricalPrice'
 import Dividends from './Dividends'
 import Financials from './Financials'
+import { usePrefetchQuery } from '@tanstack/react-query'
+import { getFinancials } from '@/api/financial'
 
 interface Props {
   symbol: string
@@ -10,6 +12,11 @@ interface Props {
 
 const StockAnalysis = ({ symbol, children }: PropsWithChildren<Props>) => {
   const [annual, setAnnual] = useState(true)
+
+  usePrefetchQuery({
+    queryKey: ['financials', symbol, annual],
+    queryFn: () => getFinancials(symbol, annual),
+  })
 
   return (
     <stockAnalysisContext.Provider value={{ symbol, annual, setAnnual }}>

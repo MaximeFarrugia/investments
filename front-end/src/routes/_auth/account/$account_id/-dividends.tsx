@@ -9,7 +9,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   ChartContainer,
@@ -26,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import DatePicker from '@/components/DatePicker'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 
 const Dividends = () => {
   const { account_id } = Route.useParams()
@@ -38,8 +38,8 @@ const Dividends = () => {
   )
   const { data, error, isPending } = useQuery({
     queryKey: ['dividends', account_id, startDate, endDate],
-    queryFn: async () => {
-      return await getDividends(account_id, {
+    queryFn: () => {
+      return getDividends(account_id, {
         start_date: startDate,
         end_date: endDate,
       })
@@ -120,16 +120,15 @@ const Dividends = () => {
   if (error) return <ApiError error={error} />
 
   return (
-    <Card className="h-fit flex-1">
+    <Card>
       <CardHeader>
-        <CardTitle>Dividends</CardTitle>
         <CardDescription className="flex flex-wrap items-center gap-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="currency" className="px-1">
               Currency
             </Label>
             <Select onValueChange={setCurrency} value={currency}>
-              <SelectTrigger id="currency" className="w-[100px]">
+              <SelectTrigger id="currency" className="w-[120px]">
                 <SelectValue placeholder="Currency" />
               </SelectTrigger>
               <SelectContent>
@@ -162,7 +161,7 @@ const Dividends = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={{}} className="min-h-[200px] w-full">
+        <ChartContainer config={{}} className="w-full">
           <ComposedChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="date" />
@@ -181,9 +180,9 @@ const Dividends = () => {
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <CardDescription className="flex flex-col gap-2 items-center w-full">
+        <CardDescription className="flex flex-wrap gap-2 justify-center w-full">
           {Object.entries(totalDividends).map(([k, v]) => (
-            <span key={k}>{`${k}: ${v}`}</span>
+            <Badge key={k}>{`${k}: ${v}`}</Badge>
           ))}
         </CardDescription>
       </CardFooter>

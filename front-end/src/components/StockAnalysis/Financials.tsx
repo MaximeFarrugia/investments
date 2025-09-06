@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
-import ApiError from '../ApiError'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useStockAnalysis } from './context'
 import { useMemo } from 'react'
 import { getFinancials, type Facts } from '@/api/financial'
@@ -19,9 +18,11 @@ interface Props {
 
 const Financials = ({ content, concepts }: Props) => {
   const { symbol, annual } = useStockAnalysis()
-  const { isPending, error, data } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ['financials', symbol, annual],
     queryFn: () => getFinancials(symbol, annual),
+    gcTime: 30 * 1000,
+    staleTime: 30 * 1000,
   })
 
   const chartData = useMemo(() => {
@@ -62,14 +63,6 @@ const Financials = ({ content, concepts }: Props) => {
       return order.indexOf(fpA) - order.indexOf(fpB)
     })
   }, [data, concepts])
-
-  if (isPending) {
-    return <p>Loading financials...</p>
-  }
-
-  if (error) {
-    return <ApiError error={error} />
-  }
 
   return content(chartData)
 }

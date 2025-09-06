@@ -101,7 +101,7 @@ function RouteComponent() {
       accountsPagination.offset,
       accountsPagination.limit,
     ],
-    queryFn: async () => await listAccounts(accountsPagination),
+    queryFn: () => listAccounts(accountsPagination),
   })
 
   const newAccountMutation = useMutation({

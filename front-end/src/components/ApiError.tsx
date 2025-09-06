@@ -11,13 +11,19 @@ interface Props {
 
 const ApiError = ({ error }: Props) => {
   const navigate = useNavigate()
+
   const errorMessage = useMemo(() => {
     if (axios.isAxiosError(error)) {
-      return (
+      const message = (
         (error as AxiosError<AppError>).response?.data.title ??
+        (error as AxiosError<AppError>).response?.data.detail ??
         (error as AxiosError<string>).response?.data ??
         (error as AxiosError).message
       )
+      if (typeof message !== 'string') {
+        return JSON.stringify(message)
+      }
+      return message
     } else {
       return error.message
     }
@@ -28,7 +34,6 @@ const ApiError = ({ error }: Props) => {
       navigate({ to: '/login' })
     }
   }, [error, navigate])
-  console.log(error)
 
   return axios.isAxiosError(error) ? (
     <Alert variant="destructive">

@@ -1,12 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
 import OpenPositions from './-open_positions'
 import Dividends from './-dividends'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 function RouteComponent() {
   return (
-    <div className="p-4 flex gap-2 flex-wrap">
-      <OpenPositions />
-      <Dividends />
+    <div className="p-4">
+      <Tabs defaultValue="dividends">
+        <TabsList>
+          <TabsTrigger value="dividends">Dividends</TabsTrigger>
+          <TabsTrigger value="analysis">Analysis</TabsTrigger>
+        </TabsList>
+        <TabsContent value="dividends">
+          <Dividends />
+        </TabsContent>
+        <TabsContent value="analysis">
+          <OpenPositions />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

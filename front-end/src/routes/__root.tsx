@@ -4,16 +4,21 @@ import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { createGlobalStyle } from 'styled-components'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+})
 
 declare global {
   interface Window {
-    __TANSTACK_QUERY_CLIENT__:
-      import("@tanstack/query-core").QueryClient;
+    __TANSTACK_QUERY_CLIENT__: import('@tanstack/query-core').QueryClient
   }
 }
 
-window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+window.__TANSTACK_QUERY_CLIENT__ = queryClient
 
 const RootComponent = () => {
   return (

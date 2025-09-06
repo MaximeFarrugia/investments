@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/chart'
 import { useCallback } from 'react'
 import { Brush, CartesianGrid, Bar, BarChart, XAxis, YAxis } from 'recharts'
+import FallbackCard from './-fallback_card'
 
 const Dividends = () => {
   const getStartIndex = useCallback(
@@ -29,36 +30,38 @@ const Dividends = () => {
   )
 
   return (
-    <StockAnalysis.Dividends
-      content={(data) => (
-        <PopOutCard
-          title="Dividends"
-          card={() => (
-            <ChartContainer config={{}}>
-              <BarChart data={data.slice(getStartIndex(data))}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="ex_dividend_date" hide />
-                <YAxis domain={['auto', 'auto']} hide />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="amount" fill="var(--color-lime-400)" />
-              </BarChart>
-            </ChartContainer>
-          )}
-          dialog={() => (
-            <ChartContainer config={{}}>
-              <BarChart data={data}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="ex_dividend_date" />
-                <YAxis domain={['auto', 'auto']} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="amount" fill="var(--color-lime-400)" />
-                <Brush dataKey="ex_dividend_date" height={20} />
-              </BarChart>
-            </ChartContainer>
-          )}
-        />
-      )}
-    />
+    <FallbackCard title="Dividends">
+      <StockAnalysis.Dividends
+        content={(data) => (
+          <PopOutCard
+            title="Dividends"
+            card={() => (
+              <ChartContainer config={{}}>
+                <BarChart data={data.slice(getStartIndex(data))}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="ex_dividend_date" hide />
+                  <YAxis domain={['auto', 'auto']} hide />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="amount" fill="var(--color-lime-400)" />
+                </BarChart>
+              </ChartContainer>
+            )}
+            dialog={() => (
+              <ChartContainer config={{}}>
+                <BarChart data={data}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="ex_dividend_date" />
+                  <YAxis domain={['auto', 'auto']} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="amount" fill="var(--color-lime-400)" />
+                  <Brush dataKey="ex_dividend_date" height={20} />
+                </BarChart>
+              </ChartContainer>
+            )}
+          />
+        )}
+      />
+    </FallbackCard>
   )
 }
 

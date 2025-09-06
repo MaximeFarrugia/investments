@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
-import ApiError from '../ApiError'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   getHistoricalPrice,
   type HistoricalPriceApiResponse,
@@ -12,20 +11,14 @@ interface Props {
 
 const HistoricalPrice = ({ content }: Props) => {
   const { symbol } = useStockAnalysis()
-  const { isPending, error, data } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ['historical_price', symbol],
     queryFn: () => getHistoricalPrice(symbol),
+    gcTime: 30 * 1000,
+    staleTime: 30 * 1000,
   })
 
-  if (isPending) {
-    return <p>Loading historical price...</p>
-  }
-
-  if (error) {
-    return <ApiError error={error} />
-  }
-
-  return content(data.data.results)
+  return content(data.data.results ?? [])
 }
 
 export default HistoricalPrice
