@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import HistoricalPrice from './-historical_price'
 import Dividends from './-dividends'
 import Financials from './-financials'
+import Info from './-info'
 
 interface Props {
   symbol: string
@@ -34,6 +35,7 @@ const AnalysisCharts = ({ symbol }: Props) => {
           }
         </stockAnalysisContext.Consumer>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Info className="col-span-4" />
           <HistoricalPrice />
           <Dividends />
           <Financials

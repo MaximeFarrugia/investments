@@ -50,14 +50,17 @@ const HistoricalPrice = () => {
 
               return (
                 <div className="flex flex-col gap-2">
-                  <CardDescription>
-                    YTD:{' '}
-                    <span
-                      className={
-                        ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
-                      }
-                    >
-                      {ytdReturn}%
+                  <CardDescription className="flex flex-col gap-2">
+                    <span>Provider: Yahoo Finance</span>
+                    <span>
+                      YTD:{' '}
+                      <span
+                        className={
+                          ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
+                        }
+                      >
+                        {ytdReturn}%
+                      </span>
                     </span>
                   </CardDescription>
                   <ChartContainer config={{}}>
@@ -77,14 +80,17 @@ const HistoricalPrice = () => {
 
               return (
                 <div className="flex flex-col gap-2">
-                  <CardDescription>
-                    YTD:{' '}
-                    <span
-                      className={
-                        ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
-                      }
-                    >
-                      {ytdReturn}%
+                  <CardDescription className="flex flex-col gap-2">
+                    <span>Provider: Yahoo Finance</span>
+                    <span>
+                      YTD:{' '}
+                      <span
+                        className={
+                          ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
+                        }
+                      >
+                        {ytdReturn}%
+                      </span>
                     </span>
                   </CardDescription>
                   <ChartContainer config={{}}>

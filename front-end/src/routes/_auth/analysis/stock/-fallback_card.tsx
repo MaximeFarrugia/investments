@@ -7,10 +7,15 @@ import { Suspense, type PropsWithChildren } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 interface Props {
+  className?: string
   title: string
 }
 
-const FallbackCard = ({ title, children }: PropsWithChildren<Props>) => {
+const FallbackCard = ({
+  className,
+  title,
+  children,
+}: PropsWithChildren<Props>) => {
   const { symbol, annual } = useStockAnalysis()
 
   return (
@@ -18,7 +23,7 @@ const FallbackCard = ({ title, children }: PropsWithChildren<Props>) => {
       {({ reset }) => (
         <Suspense
           fallback={
-            <Card>
+            <Card className={className}>
               <CardHeader>
                 <CardTitle>{title}</CardTitle>
               </CardHeader>
@@ -36,8 +41,7 @@ const FallbackCard = ({ title, children }: PropsWithChildren<Props>) => {
             onReset={reset}
             resetKeys={[symbol, annual]}
             fallbackRender={({ error }) => (
-              // fallback={(error) => (
-              <Card>
+              <Card className={className}>
                 <CardHeader>
                   <CardTitle>{title}</CardTitle>
                 </CardHeader>

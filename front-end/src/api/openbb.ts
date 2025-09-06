@@ -44,3 +44,39 @@ export const getHistoricalDividends = (symbol: string) => {
     },
   )
 }
+
+export interface CompanyProfileApiResponse {
+  results: Array<{
+    symbol: string
+    name?: string
+    stock_exchange: string
+    long_description?: string
+    company_url?: string
+    business_phone_no?: string
+    hq_address1?: string
+    hq_address_city?: string
+    hq_address_postal_code?: string
+    hq_country?: string
+    employees?: number
+    sector?: string
+    industry_category?: string
+    issue_type: string
+    currency?: string
+    market_cap?: number
+    shares_outstanding?: number
+    shares_float?: number
+    shares_implied_outstanding?: number
+    shares_short?: number
+    dividend_yield?: number
+    beta?: number
+  }>
+}
+
+export const getCompanyProfile = (symbol: string) => {
+  return axios.get<CompanyProfileApiResponse>('/openbb/api/v1/equity/profile', {
+    params: {
+      provider: 'yfinance',
+      symbol,
+    },
+  })
+}

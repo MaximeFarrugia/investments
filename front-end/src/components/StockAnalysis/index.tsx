@@ -5,6 +5,7 @@ import Dividends from './Dividends'
 import Financials from './Financials'
 import { usePrefetchQuery } from '@tanstack/react-query'
 import { getFinancials } from '@/api/financial'
+import Info from './Info'
 
 interface Props {
   symbol: string
@@ -28,5 +29,6 @@ const StockAnalysis = ({ symbol, children }: PropsWithChildren<Props>) => {
 StockAnalysis.HistoricalPrice = HistoricalPrice
 StockAnalysis.Dividends = Dividends
 StockAnalysis.Financials = Financials
+StockAnalysis.Info = Info
 
 export default StockAnalysis

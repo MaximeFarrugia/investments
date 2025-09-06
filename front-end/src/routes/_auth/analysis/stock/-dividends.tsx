@@ -9,6 +9,7 @@ import {
 import { useCallback } from 'react'
 import { Brush, CartesianGrid, Bar, BarChart, XAxis, YAxis } from 'recharts'
 import FallbackCard from './-fallback_card'
+import { CardDescription } from '@/components/ui/card'
 
 const Dividends = () => {
   const getStartIndex = useCallback(
@@ -36,27 +37,37 @@ const Dividends = () => {
           <PopOutCard
             title="Dividends"
             card={() => (
-              <ChartContainer config={{}}>
-                <BarChart data={data.slice(getStartIndex(data))}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="ex_dividend_date" hide />
-                  <YAxis domain={['auto', 'auto']} hide />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="amount" fill="var(--color-lime-400)" />
-                </BarChart>
-              </ChartContainer>
+              <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: Yahoo Finance</span>
+                </CardDescription>
+                <ChartContainer config={{}}>
+                  <BarChart data={data.slice(getStartIndex(data))}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="ex_dividend_date" hide />
+                    <YAxis domain={['auto', 'auto']} hide />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="amount" fill="var(--color-lime-400)" />
+                  </BarChart>
+                </ChartContainer>
+              </div>
             )}
             dialog={() => (
-              <ChartContainer config={{}}>
-                <BarChart data={data}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="ex_dividend_date" />
-                  <YAxis domain={['auto', 'auto']} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="amount" fill="var(--color-lime-400)" />
-                  <Brush dataKey="ex_dividend_date" height={20} />
-                </BarChart>
-              </ChartContainer>
+              <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: Yahoo Finance</span>
+                </CardDescription>
+                <ChartContainer config={{}}>
+                  <BarChart data={data}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="ex_dividend_date" />
+                    <YAxis domain={['auto', 'auto']} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="amount" fill="var(--color-lime-400)" />
+                    <Brush dataKey="ex_dividend_date" height={20} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
             )}
           />
         )}

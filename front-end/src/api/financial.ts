@@ -34,10 +34,24 @@ export interface FinancialsResponse {
 }
 
 export const getFinancials = (symbol: string, annual?: boolean) => {
-  return axios.get<FinancialsResponse>('/api/financial', {
+  return axios.get<FinancialsResponse>('/api/financial/facts', {
     params: {
       symbol,
       annual,
+    },
+  })
+}
+
+export interface CompanyInfoResponse {
+  ticker: string
+  name: string
+  cik: number
+}
+
+export const getCompanyInfo = (symbol: string) => {
+  return axios.get<CompanyInfoResponse>('/api/financial/info', {
+    params: {
+      symbol,
     },
   })
 }

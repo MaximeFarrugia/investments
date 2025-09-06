@@ -10,6 +10,7 @@ import { getBarMap, initHiddenBars, moneyAmountFormatter } from './-utils'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import FallbackCard from './-fallback_card'
+import { CardDescription } from '@/components/ui/card'
 
 interface Props {
   concepts: Record<
@@ -30,29 +31,37 @@ const Financials = ({ concepts, title }: Props) => {
           <PopOutCard
             title={title}
             card={() => (
-              <ChartContainer config={{}}>
-                <BarChart data={data}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="fpy" hide />
-                  <YAxis
-                    domain={['auto', 'auto']}
-                    tickFormatter={moneyAmountFormatter}
-                    hide
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  {getBarMap(concepts).map((e) => (
-                    <Bar
-                      key={e.concept}
-                      dataKey={e.label}
-                      stackId={e.category}
-                      fill={e.color}
+              <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: SEC</span>
+                </CardDescription>
+                <ChartContainer config={{}}>
+                  <BarChart data={data}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="fpy" hide />
+                    <YAxis
+                      domain={['auto', 'auto']}
+                      tickFormatter={moneyAmountFormatter}
+                      hide
                     />
-                  ))}
-                </BarChart>
-              </ChartContainer>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    {getBarMap(concepts).map((e) => (
+                      <Bar
+                        key={e.concept}
+                        dataKey={e.label}
+                        stackId={e.category}
+                        fill={e.color}
+                      />
+                    ))}
+                  </BarChart>
+                </ChartContainer>
+              </div>
             )}
             dialog={() => (
               <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: SEC</span>
+                </CardDescription>
                 {Object.keys(concepts).length > 1 && (
                   <div className="flex flex-wrap justify-center gap-2">
                     {Object.entries(hiddenBars).map(([category, hidden]) => (

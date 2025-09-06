@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use anyhow::Context;
+use serde::Deserialize;
 
 use crate::{SecClient, company_facts::CompanyFacts};
 
@@ -7,37 +10,36 @@ pub struct Company {
     pub ticker: String,
     pub cik: usize,
     pub name: String,
-    pub facts: CompanyFacts,
+}
+
+#[derive(Deserialize)]
+struct CompanyTickerData {
+    pub(crate) cik_str: usize,
+    pub(crate) ticker: String,
+    pub(crate) title: String,
 }
 
 impl Company {
     pub async fn get_company(ticker: &str, client: &SecClient) -> Result<Self, crate::Error> {
-        let ticker = ticker.to_lowercase().replace(".", "-");
+        let ticker = ticker.to_uppercase().replace(".", "-");
         let tickers = client
             .http
-            .get("https://www.sec.gov/include/ticker.txt")
+            .get("https://www.sec.gov/files/company_tickers.json")
             .send()
             .await
             .context("Get ticker list from SEC")?
-            .text()
+            .json::<HashMap<String, CompanyTickerData>>()
             .await
-            .context("Parse SEC's ticker list to text")?;
-        let ticker_data = tickers
-            .split("\n")
-            .map(|x| x.split("\t").collect::<Vec<_>>())
-            .find(|x| x[0] == ticker);
+            .context("Parse SEC's ticker list to json")?;
+
+        let ticker_data = tickers.iter().find(|x| x.1.ticker == ticker);
 
         match ticker_data {
-            Some(ticker_data) => {
-                let cik = ticker_data[1]
-                    .parse::<usize>()
-                    .context("Parsing ticker's cik to usize")?;
-                let facts = CompanyFacts::get_facts(cik.to_string(), client).await?;
+            Some((_, ticker_data)) => {
                 Ok(Self {
-                    ticker: ticker_data[0].to_owned(),
-                    cik,
-                    name: facts.entity_name.to_owned(),
-                    facts,
+                    ticker: ticker_data.ticker.to_owned(),
+                    cik: ticker_data.cik_str,
+                    name: ticker_data.title.to_owned(),
                 })
             }
             None => Err(crate::Error::NotFound(ticker.to_owned())),
