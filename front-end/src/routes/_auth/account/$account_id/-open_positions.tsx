@@ -3,21 +3,28 @@ import { Route } from '.'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { getOpenPositions } from '@/api/portfolio'
 import ApiError from '@/components/ApiError'
-import {
-  Card,
-  CardAction,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  PaginationNextButton,
-  PaginationPreviousButton,
-} from '@/components/ui/pagination'
 import AnalysisCharts from '../../analysis/stock/-analysis_charts'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import { cn } from '@/lib/utils'
 
 const OpenPositions = () => {
   const { account_id } = Route.useParams()
   const [symbol, setSymbol] = useState('')
+  const [open, setOpen] = useState(false)
 
   const {
     data,
@@ -39,21 +46,16 @@ const OpenPositions = () => {
     },
   })
 
+  useEffect(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
   const openPositions = useMemo(
     () => data?.pages?.flatMap?.((e) => e.data.open_positions) ?? [],
     [data],
   )
-
-  const idx = useMemo(
-    () => openPositions.findIndex((e) => e.symbol === symbol),
-    [openPositions, symbol],
-  )
-
-  useEffect(() => {
-    if (openPositions.length && !symbol) {
-      setSymbol(openPositions[0].symbol)
-    }
-  }, [openPositions, symbol, setSymbol])
 
   if (isPending) return <p>Loading Open Positions...</p>
 
@@ -61,32 +63,47 @@ const OpenPositions = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card>
-        <CardHeader>
-          <CardTitle>{symbol}</CardTitle>
-          <CardAction className="flex flex-row gap-2">
-            {idx > 0 && (
-              <PaginationPreviousButton
-                onClick={() => setSymbol(openPositions[idx - 1].symbol)}
-              />
-            )}
-            {(idx + 1 < openPositions.length || hasNextPage) && (
-              <PaginationNextButton
-                onClick={() => {
-                  if (
-                    idx + 2 >= openPositions.length &&
-                    hasNextPage &&
-                    !isFetchingNextPage
-                  ) {
-                    fetchNextPage()
-                  }
-                  setSymbol(openPositions[idx + 1].symbol)
-                }}
-              />
-            )}
-          </CardAction>
-        </CardHeader>
-      </Card>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            className="w-[200px] justify-between"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+          >
+            {symbol || 'Symbol'}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search symbol..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No symbol found.</CommandEmpty>
+              <CommandGroup>
+                {openPositions.map((e) => (
+                  <CommandItem
+                    key={e.id}
+                    value={e.symbol}
+                    onSelect={(s) => {
+                      setSymbol(s)
+                      setOpen(false)
+                    }}
+                  >
+                    {e.symbol}
+                    <Check
+                      className={cn(
+                        'ml-auto',
+                        symbol === e.symbol ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
       {!!symbol && <AnalysisCharts symbol={symbol} />}
     </div>
   )
