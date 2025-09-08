@@ -17,30 +17,30 @@ const AnalysisCharts = () => {
 
   return (
     <div className="flex flex-col gap-2">
-              <div className="flex gap-2">
-                <Button
+      <div className="flex gap-2">
+        <Button
           onClick={() => {
             clearStockAnalysisDataCache(queryClient, symbol, false)
             preloadStockAnalysisData(queryClient, symbol, true)
             setAnnual(true)
           }}
           variant={annual ? 'default' : 'outline'}
-                >
-                  Annual
-                </Button>
-                <Button
+        >
+          Annual
+        </Button>
+        <Button
           onClick={() => {
             clearStockAnalysisDataCache(queryClient, symbol, true)
             preloadStockAnalysisData(queryClient, symbol, false)
             setAnnual(false)
           }}
           variant={annual ? 'outline' : 'default'}
-                >
-                  Quarterly
-                </Button>
-              </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Info className="col-span-full" />
+        >
+          Quarterly
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Info className="col-span-full" />
         <FallbackCard title="Historical Price">
           <HistoricalPrice />
         </FallbackCard>
@@ -139,6 +139,14 @@ const AnalysisCharts = () => {
           <Financials
             title="Free Cash Flow"
             concepts={{
+              free_cash_flow: [
+                {
+                  concept:
+                    'calc(sub(us-gaap:NetCashProvidedByUsedInOperatingActivities, us-gaap:PaymentsToAcquirePropertyPlantAndEquipment))',
+                  label: 'Free Cash Flow',
+                  color: 'var(--color-orange-500)',
+                },
+              ],
               share_based_comp: [
                 {
                   concept: 'us-gaap:ShareBasedCompensation',
@@ -154,7 +162,7 @@ const AnalysisCharts = () => {
             }}
           />
         </FallbackCard>
-        </div>
+      </div>
     </div>
   )
 }
