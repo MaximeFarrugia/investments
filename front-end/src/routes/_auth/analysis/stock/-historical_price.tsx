@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/chart'
 import { useCallback } from 'react'
 import { Brush, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
-import FallbackCard from './-fallback_card'
 
 const HistoricalPrice = () => {
   const getStartIndex = useCallback(
@@ -40,80 +39,78 @@ const HistoricalPrice = () => {
   )
 
   return (
-    <FallbackCard title="Historical Price">
-      <StockAnalysis.HistoricalPrice
-        content={(data) => (
-          <PopOutCard
-            title="Historical Price"
-            card={() => {
-              const ytdReturn = getYtdReturn(data)
+    <StockAnalysis.HistoricalPrice
+      content={(data) => (
+        <PopOutCard
+          title="Historical Price"
+          card={() => {
+            const ytdReturn = getYtdReturn(data)
 
-              return (
-                <div className="flex flex-col gap-2">
-                  <CardDescription className="flex flex-col gap-2">
-                    <span>Provider: Yahoo Finance</span>
-                    <span>
-                      YTD:{' '}
-                      <span
-                        className={
-                          ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
-                        }
-                      >
-                        {ytdReturn}%
-                      </span>
+            return (
+              <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: Yahoo Finance</span>
+                  <span>
+                    YTD:{' '}
+                    <span
+                      className={
+                        ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
+                      }
+                    >
+                      {ytdReturn}%
                     </span>
-                  </CardDescription>
-                  <ChartContainer config={{}}>
-                    <LineChart data={data.slice(getStartIndex(data))}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis dataKey="date" hide />
-                      <YAxis domain={['auto', 'auto']} hide />
-                      <Line dataKey="close" dot={false} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
-              )
-            }}
-            dialog={() => {
-              const ytdReturn = getYtdReturn(data)
+                  </span>
+                </CardDescription>
+                <ChartContainer config={{}} className="w-full">
+                  <LineChart data={data.slice(getStartIndex(data))}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="date" hide />
+                    <YAxis domain={['auto', 'auto']} hide />
+                    <Line dataKey="close" dot={false} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </LineChart>
+                </ChartContainer>
+              </div>
+            )
+          }}
+          dialog={() => {
+            const ytdReturn = getYtdReturn(data)
 
-              return (
-                <div className="flex flex-col gap-2">
-                  <CardDescription className="flex flex-col gap-2">
-                    <span>Provider: Yahoo Finance</span>
-                    <span>
-                      YTD:{' '}
-                      <span
-                        className={
-                          ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
-                        }
-                      >
-                        {ytdReturn}%
-                      </span>
+            return (
+              <div className="flex flex-col gap-2">
+                <CardDescription className="flex flex-col gap-2">
+                  <span>Provider: Yahoo Finance</span>
+                  <span>
+                    YTD:{' '}
+                    <span
+                      className={
+                        ytdReturn < 0 ? 'text-red-500' : 'text-green-500'
+                      }
+                    >
+                      {ytdReturn}%
                     </span>
-                  </CardDescription>
-                  <ChartContainer config={{}}>
-                    <LineChart data={data}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={['auto', 'auto']} />
-                      <Line dataKey="close" dot={false} />
-                      <Brush
-                        dataKey="date"
-                        startIndex={getStartIndex(data)}
-                        height={20}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
-              )
-            }}
-          />
-        )}
-      />
-    </FallbackCard>
+                  </span>
+                </CardDescription>
+                <ChartContainer config={{}} className="w-full">
+                  <LineChart data={data}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={['auto', 'auto']} />
+                    <Line dataKey="close" dot={false} />
+                    <Brush
+                      dataKey="date"
+                      startIndex={getStartIndex(data)}
+                      height={20}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </LineChart>
+                </ChartContainer>
+              </div>
+            )
+          }}
+        />
+      )}
+    />
   )
 }
 

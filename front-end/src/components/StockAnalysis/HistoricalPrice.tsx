@@ -14,7 +14,6 @@ const HistoricalPrice = ({ content }: Props) => {
   const { data } = useSuspenseQuery({
     queryKey: ['historical_price', symbol],
     queryFn: () => getHistoricalPrice(symbol),
-    gcTime: 30 * 1000,
     staleTime: 30 * 1000,
   })
 

@@ -7,6 +7,7 @@ import { createFormHook } from '@tanstack/react-form'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import z from 'zod'
 import AnalysisCharts from './-analysis_charts'
+import StockAnalysis from '@/components/StockAnalysis'
 
 const { useAppForm } = createFormHook({
   fieldComponents: {
@@ -72,7 +73,11 @@ function RouteComponent() {
           )}
         />
       </form>
-      {!!symbol && <AnalysisCharts symbol={symbol} />}
+      {!!symbol && (
+        <StockAnalysis symbol={symbol}>
+          <AnalysisCharts />
+        </StockAnalysis>
+      )}
     </div>
   )
 }

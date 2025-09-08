@@ -9,7 +9,6 @@ import { Brush, CartesianGrid, Bar, BarChart, XAxis, YAxis } from 'recharts'
 import { getBarMap, initHiddenBars, moneyAmountFormatter } from './-utils'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import FallbackCard from './-fallback_card'
 import { CardDescription } from '@/components/ui/card'
 
 interface Props {
@@ -24,89 +23,87 @@ const Financials = ({ concepts, title }: Props) => {
   const [hiddenBars, setHiddenBars] = useState(initHiddenBars(concepts))
 
   return (
-    <FallbackCard title={title}>
-      <StockAnalysis.Financials
-        concepts={concepts}
-        content={(data) => (
-          <PopOutCard
-            title={title}
-            card={() => (
-              <div className="flex flex-col gap-2">
-                <CardDescription className="flex flex-col gap-2">
-                  <span>Provider: SEC</span>
-                </CardDescription>
-                <ChartContainer config={{}}>
-                  <BarChart data={data}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="fpy" hide />
-                    <YAxis
-                      domain={['auto', 'auto']}
-                      tickFormatter={moneyAmountFormatter}
-                      hide
+    <StockAnalysis.Financials
+      concepts={concepts}
+      content={(data) => (
+        <PopOutCard
+          title={title}
+          card={() => (
+            <div className="flex flex-col gap-2">
+              <CardDescription className="flex flex-col gap-2">
+                <span>Provider: SEC</span>
+              </CardDescription>
+              <ChartContainer config={{}} className="w-full">
+                <BarChart data={data}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="fpy" hide />
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    tickFormatter={moneyAmountFormatter}
+                    hide
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  {getBarMap(concepts).map((e) => (
+                    <Bar
+                      key={e.concept}
+                      dataKey={e.label}
+                      stackId={e.category}
+                      fill={e.color}
                     />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    {getBarMap(concepts).map((e) => (
-                      <Bar
-                        key={e.concept}
-                        dataKey={e.label}
-                        stackId={e.category}
-                        fill={e.color}
-                      />
-                    ))}
-                  </BarChart>
-                </ChartContainer>
-              </div>
-            )}
-            dialog={() => (
-              <div className="flex flex-col gap-2">
-                <CardDescription className="flex flex-col gap-2">
-                  <span>Provider: SEC</span>
-                </CardDescription>
-                {Object.keys(concepts).length > 1 && (
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {Object.entries(hiddenBars).map(([category, hidden]) => (
-                      <Button
-                        key={category}
-                        variant={hidden ? 'outline' : 'default'}
-                        onClick={() =>
-                          setHiddenBars((e) => ({
-                            ...e,
-                            [category]: !e[category as keyof typeof hiddenBars],
-                          }))
-                        }
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                )}
-                <ChartContainer config={{}}>
-                  <BarChart data={data}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="fpy" />
-                    <YAxis
-                      domain={['auto', 'auto']}
-                      tickFormatter={moneyAmountFormatter}
+                  ))}
+                </BarChart>
+              </ChartContainer>
+            </div>
+          )}
+          dialog={() => (
+            <div className="flex flex-col gap-2">
+              <CardDescription className="flex flex-col gap-2">
+                <span>Provider: SEC</span>
+              </CardDescription>
+              {Object.keys(concepts).length > 1 && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {Object.entries(hiddenBars).map(([category, hidden]) => (
+                    <Button
+                      key={category}
+                      variant={hidden ? 'outline' : 'default'}
+                      onClick={() =>
+                        setHiddenBars((e) => ({
+                          ...e,
+                          [category]: !e[category as keyof typeof hiddenBars],
+                        }))
+                      }
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
+              )}
+              <ChartContainer config={{}} className="w-full">
+                <BarChart data={data}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="fpy" />
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    tickFormatter={moneyAmountFormatter}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  {getBarMap(concepts).map((e) => (
+                    <Bar
+                      key={e.concept}
+                      dataKey={e.label}
+                      stackId={e.category}
+                      fill={e.color}
+                      hide={hiddenBars[e.label]}
                     />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    {getBarMap(concepts).map((e) => (
-                      <Bar
-                        key={e.concept}
-                        dataKey={e.label}
-                        stackId={e.category}
-                        fill={e.color}
-                        hide={hiddenBars[e.label]}
-                      />
-                    ))}
-                    <Brush dataKey="fpy" height={20} />
-                  </BarChart>
-                </ChartContainer>
-              </div>
-            )}
-          />
-        )}
-      />
-    </FallbackCard>
+                  ))}
+                  <Brush dataKey="fpy" height={20} />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          )}
+        />
+      )}
+    />
   )
 }
 

@@ -1,43 +1,53 @@
-import StockAnalysis from '@/components/StockAnalysis'
-import { stockAnalysisContext } from '@/components/StockAnalysis/context'
+import { useStockAnalysis } from '@/components/StockAnalysis/context'
 import { Button } from '@/components/ui/button'
 import HistoricalPrice from './-historical_price'
 import Dividends from './-dividends'
 import Financials from './-financials'
 import Info from './-info'
+import FallbackCard from './-fallback_card'
+import {
+  clearStockAnalysisDataCache,
+  preloadStockAnalysisData,
+} from '@/components/StockAnalysis/utils'
+import { useQueryClient } from '@tanstack/react-query'
 
-interface Props {
-  symbol: string
-}
+const AnalysisCharts = () => {
+  const queryClient = useQueryClient()
+  const { symbol, annual, setAnnual } = useStockAnalysis()
 
-const AnalysisCharts = ({ symbol }: Props) => {
   return (
     <div className="flex flex-col gap-2">
-      <StockAnalysis symbol={symbol}>
-        <stockAnalysisContext.Consumer>
-          {(context) =>
-            !!context && (
               <div className="flex gap-2">
                 <Button
-                  onClick={() => context.setAnnual(true)}
-                  variant={context.annual ? 'default' : 'outline'}
+          onClick={() => {
+            clearStockAnalysisDataCache(queryClient, symbol, false)
+            preloadStockAnalysisData(queryClient, symbol, true)
+            setAnnual(true)
+          }}
+          variant={annual ? 'default' : 'outline'}
                 >
                   Annual
                 </Button>
                 <Button
-                  onClick={() => context.setAnnual(false)}
-                  variant={context.annual ? 'outline' : 'default'}
+          onClick={() => {
+            clearStockAnalysisDataCache(queryClient, symbol, true)
+            preloadStockAnalysisData(queryClient, symbol, false)
+            setAnnual(false)
+          }}
+          variant={annual ? 'outline' : 'default'}
                 >
                   Quarterly
                 </Button>
               </div>
-            )
-          }
-        </stockAnalysisContext.Consumer>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Info className="col-span-full" />
+        <FallbackCard title="Historical Price">
           <HistoricalPrice />
+        </FallbackCard>
+        <FallbackCard title="Dividends">
           <Dividends />
+        </FallbackCard>
+        <FallbackCard title="Financials">
           <Financials
             title="Revenue"
             concepts={{
@@ -94,6 +104,11 @@ const AnalysisCharts = ({ symbol }: Props) => {
                   label: 'Shares Outstanding',
                   color: 'var(--color-teal-600)',
                 },
+                {
+                  concept: 'dei:EntityCommonStockSharesOutstanding',
+                  label: 'Shares Outstanding',
+                  color: 'var(--color-teal-600)',
+                },
               ],
             }}
           />
@@ -138,8 +153,8 @@ const AnalysisCharts = ({ symbol }: Props) => {
               ],
             }}
           />
+        </FallbackCard>
         </div>
-      </StockAnalysis>
     </div>
   )
 }

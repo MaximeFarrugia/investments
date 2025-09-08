@@ -21,39 +21,39 @@ const FallbackCard = ({
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
-        <Suspense
-          fallback={
+        <ErrorBoundary
+          onReset={reset}
+          resetKeys={[symbol, annual]}
+          fallbackRender={({ error }) => (
             <Card className={className}>
               <CardHeader>
                 <CardTitle>{title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col gap-2">
-                  <Skeleton className="h-4 w-[50%]" />
-                  <Skeleton className="h-4 w-[20%]" />
-                  <Skeleton className="h-4 w-[30%]" />
-                </div>
+                <ApiError error={error} />
               </CardContent>
             </Card>
-          }
+          )}
         >
-          <ErrorBoundary
-            onReset={reset}
-            resetKeys={[symbol, annual]}
-            fallbackRender={({ error }) => (
+          <Suspense
+            fallback={
               <Card className={className}>
                 <CardHeader>
                   <CardTitle>{title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ApiError error={error} />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-4 w-[50%]" />
+                    <Skeleton className="h-4 w-[20%]" />
+                    <Skeleton className="h-4 w-[30%]" />
+                  </div>
                 </CardContent>
               </Card>
-            )}
+            }
           >
             {children}
-          </ErrorBoundary>
-        </Suspense>
+          </Suspense>
+        </ErrorBoundary>
       )}
     </QueryErrorResetBoundary>
   )

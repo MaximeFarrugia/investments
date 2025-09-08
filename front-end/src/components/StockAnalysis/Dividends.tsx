@@ -4,6 +4,7 @@ import {
   type HistoricalDividendsApiResponse,
 } from '@/api/openbb'
 import { useStockAnalysis } from './context'
+import { useMemo } from 'react'
 
 interface Props {
   content: (data: HistoricalDividendsApiResponse['results']) => React.ReactNode
@@ -14,11 +15,24 @@ const Dividends = ({ content }: Props) => {
   const { data } = useSuspenseQuery({
     queryKey: ['historical_dividends', symbol],
     queryFn: () => getHistoricalDividends(symbol),
-    gcTime: 30 * 1000,
     staleTime: 30 * 1000,
   })
 
-  return content(data.data.results)
+  const chartData = useMemo(
+    () =>
+      data.data.results.map((e, idx) => ({
+        ...e,
+        growth_percent:
+          idx === 0
+            ? undefined
+            : (((e.amount - data.data.results[idx - 1].amount) /
+                data.data.results[idx - 1].amount) *
+              100 || undefined),
+      })),
+    [data],
+  )
+
+  return content(chartData)
 }
 
 export default Dividends

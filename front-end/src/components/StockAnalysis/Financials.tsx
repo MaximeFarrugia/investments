@@ -21,7 +21,6 @@ const Financials = ({ content, concepts }: Props) => {
   const { data } = useSuspenseQuery({
     queryKey: ['financials', symbol, annual],
     queryFn: () => getFinancials(symbol, annual),
-    gcTime: 30 * 1000,
     staleTime: 30 * 1000,
   })
 
