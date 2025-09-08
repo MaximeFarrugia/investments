@@ -13,10 +13,17 @@ use crate::SecClient;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompanyFacts {
-    pub cik: usize,
+    pub cik: Cik,
     #[serde(rename = "entityName")]
     pub entity_name: String,
     pub facts: Facts,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum Cik {
+    String(String),
+    Number(usize),
 }
 
 #[derive(Debug, Serialize, Deserialize)]

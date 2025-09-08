@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use anyhow::Context;
 use serde::Deserialize;
 
-use crate::{SecClient, company_facts::CompanyFacts};
+use crate::SecClient;
 
 #[derive(Debug)]
 pub struct Company {
@@ -35,13 +35,11 @@ impl Company {
         let ticker_data = tickers.iter().find(|x| x.1.ticker == ticker);
 
         match ticker_data {
-            Some((_, ticker_data)) => {
-                Ok(Self {
-                    ticker: ticker_data.ticker.to_owned(),
-                    cik: ticker_data.cik_str,
-                    name: ticker_data.title.to_owned(),
-                })
-            }
+            Some((_, ticker_data)) => Ok(Self {
+                ticker: ticker_data.ticker.to_owned(),
+                cik: ticker_data.cik_str,
+                name: ticker_data.title.to_owned(),
+            }),
             None => Err(crate::Error::NotFound(ticker.to_owned())),
         }
     }
