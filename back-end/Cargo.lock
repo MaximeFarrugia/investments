@@ -1196,7 +1196,7 @@ dependencies = [
 [[package]]
 name = "ibkr-activity-statement-parser"
 version = "0.1.0"
-source = "git+https://github.com/MaximeFarrugia/ibkr-activity-statement-parser.git#5c92ad9e9af206c0775b183ccd5fec247306cbc1"
+source = "git+https://github.com/MaximeFarrugia/ibkr-activity-statement-parser.git#283d8da861b3183c7b44e2e613ce665aa2081671"
 dependencies = [
  "anyhow",
  "chrono",

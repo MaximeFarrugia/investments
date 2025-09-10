@@ -152,7 +152,13 @@ function RouteComponent() {
         <CardHeader>
           <CardTitle>Accounts</CardTitle>
           <CardAction>
-            <Dialog open={dialogVisible} onOpenChange={setDialogVisible}>
+            <Dialog
+              open={dialogVisible}
+              onOpenChange={(open) => {
+                setDialogVisible(open)
+                setDialogError(undefined)
+              }}
+            >
               <DialogTrigger asChild>
                 <Button>New account</Button>
               </DialogTrigger>

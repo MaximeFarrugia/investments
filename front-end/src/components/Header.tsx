@@ -10,6 +10,7 @@ import { userDetails } from '@/api/user'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { Skeleton } from './ui/skeleton'
+import ApiError from './ApiError'
 
 const Header = () => {
   const { isPending, error, data } = useQuery({
@@ -21,7 +22,9 @@ const Header = () => {
     [data],
   )
 
-  if (error) return <p>Error: {error.message}</p>
+  if (error) {
+    return <ApiError error={error} />
+  }
 
   return (
     <header className="bg-background sticky top-0 w-full flex items-center justify-between p-4 z-1000">

@@ -54,9 +54,39 @@ impl From<models::PortfolioAccount> for PortfolioAccount {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct AccountStatement {
+    pub id: String,
+    pub account_id: String,
+    pub start: chrono::DateTime<chrono::Utc>,
+    pub end: chrono::DateTime<chrono::Utc>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl From<&models::AccountStatement> for AccountStatement {
+    fn from(value: &models::AccountStatement) -> Self {
+        Self {
+            id: value.id.unwrap().to_string(),
+            account_id: value.account_id.to_string(),
+            start: value.start,
+            end: value.end,
+            created_at: value.created_at,
+            updated_at: value.updated_at,
+        }
+    }
+}
+
+impl From<models::AccountStatement> for AccountStatement {
+    fn from(value: models::AccountStatement) -> Self {
+        AccountStatement::from(&value)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OpenPosition {
     pub id: String,
     pub account_id: String,
+    pub statement_id: String,
     pub symbol: String,
     pub quantity: Decimal,
     pub cost_price: Decimal,
@@ -68,6 +98,7 @@ impl From<&models::OpenPosition> for OpenPosition {
         Self {
             id: value.id.unwrap().to_string(),
             account_id: value.account_id.to_string(),
+            statement_id: value.statement_id.to_string(),
             symbol: value.symbol.clone(),
             quantity: value.quantity,
             cost_price: value.cost_price,
@@ -86,6 +117,7 @@ impl From<models::OpenPosition> for OpenPosition {
 pub struct Dividend {
     pub id: String,
     pub account_id: String,
+    pub statement_id: String,
     pub symbol: String,
     pub date: chrono::DateTime<chrono::Utc>,
     pub amount: Decimal,
@@ -97,6 +129,7 @@ impl From<&models::Dividend> for Dividend {
         Self {
             id: value.id.unwrap().to_string(),
             account_id: value.account_id.to_string(),
+            statement_id: value.statement_id.to_string(),
             symbol: value.symbol.clone(),
             date: value.date,
             amount: value.amount,

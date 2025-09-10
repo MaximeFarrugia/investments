@@ -39,7 +39,7 @@ pub async fn handler(
         .limit(pagination.limit)
         .await
         .context("Failed to list accounts")?
-        .try_collect::<Vec<PortfolioAccount>>()
+        .try_collect::<Vec<_>>()
         .await
         .context("Failed to collect accounts")?
         .iter()

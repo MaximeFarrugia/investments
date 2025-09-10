@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import OpenPositions from './-open_positions'
 import Dividends from './-dividends'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Statements from './-statements'
 
 function RouteComponent() {
   return (
@@ -10,12 +11,16 @@ function RouteComponent() {
         <TabsList>
           <TabsTrigger value="dividends">Dividends</TabsTrigger>
           <TabsTrigger value="analysis">Analysis</TabsTrigger>
+          <TabsTrigger value="statements">Statements</TabsTrigger>
         </TabsList>
         <TabsContent value="dividends">
           <Dividends />
         </TabsContent>
         <TabsContent value="analysis">
           <OpenPositions />
+        </TabsContent>
+        <TabsContent value="statements">
+          <Statements />
         </TabsContent>
       </Tabs>
     </div>

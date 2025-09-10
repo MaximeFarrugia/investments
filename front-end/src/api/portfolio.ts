@@ -44,6 +44,58 @@ export const newAccount = (account: NewAccountPayload) => {
   })
 }
 
+export interface Statement {
+  id: string
+  account_id: string
+  start: string
+  end: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ListStatementsResponse {
+  statements: Statement[]
+  pagination: PaginationData
+}
+
+export const listStatements = (account_id: string, pagination: Pagination) => {
+  return axios.get<ListStatementsResponse>(
+    `/api/portfolio/accounts/${account_id}/statements`,
+    {
+      params: pagination,
+    },
+  )
+}
+
+export interface NewStatementPayload {
+  file: File
+  account_id: string
+}
+
+export interface NewStatementResponse {
+  statement_id: string
+}
+
+export const newStatement = (statement: NewStatementPayload) => {
+  const formData = new FormData()
+  formData.append('file', statement.file)
+  return axios.post<NewStatementResponse>(
+    `/api/portfolio/accounts/${statement.account_id}/statements`,
+    formData,
+    {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    },
+  )
+}
+
+export const deleteStatement = (account_id: string, statement_id: string) => {
+  return axios.delete<void>(
+    `/api/portfolio/accounts/${account_id}/statements/${statement_id}`,
+  )
+}
+
 export interface OpenPositionsResponse {
   open_positions: OpenPosition[]
   pagination: PaginationData

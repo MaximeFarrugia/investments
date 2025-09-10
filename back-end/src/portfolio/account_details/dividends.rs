@@ -66,7 +66,7 @@ pub async fn handler(
         .find(filter)
         .await
         .context("Failed to list dividends")?
-        .try_collect::<Vec<Dividend>>()
+        .try_collect::<Vec<_>>()
         .await
         .context("Failed to collect dividends")?
         .iter()

@@ -28,10 +28,30 @@ impl Model for PortfolioAccount {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct AccountStatement {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
+    pub account_id: ObjectId,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub start: chrono::DateTime<chrono::Utc>,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub end: chrono::DateTime<chrono::Utc>,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl Model for AccountStatement {
+    const COLLECTION_NAME: &'static str = "account_statements";
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OpenPosition {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
     pub account_id: ObjectId,
+    pub statement_id: ObjectId,
     pub symbol: String,
     pub quantity: Decimal,
     pub cost_price: Decimal,
@@ -47,6 +67,7 @@ pub struct Dividend {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
     pub account_id: ObjectId,
+    pub statement_id: ObjectId,
     pub symbol: String,
     #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
     pub date: chrono::DateTime<chrono::Utc>,

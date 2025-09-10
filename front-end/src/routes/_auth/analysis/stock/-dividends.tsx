@@ -51,7 +51,12 @@ const Dividends = () => {
                 <ComposedChart data={data.slice(getStartIndex(data))}>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="ex_dividend_date" hide />
-                  <YAxis yAxisId="left" dataKey="amount" domain={['auto', 'auto']} hide />
+                  <YAxis
+                    yAxisId="left"
+                    dataKey="amount"
+                    domain={['auto', 'auto']}
+                    hide
+                  />
                   <YAxis
                     yAxisId="right"
                     dataKey="growth_percent"
@@ -59,8 +64,17 @@ const Dividends = () => {
                     hide
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar yAxisId="left" dataKey="amount" fill="var(--color-lime-400)" />
-                  <Line yAxisId="right" dataKey="growth_percent" connectNulls />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="amount"
+                    fill="var(--color-lime-400)"
+                  />
+                  <Line
+                    yAxisId="right"
+                    dataKey="growth_percent"
+                    name="Growth %"
+                    connectNulls
+                  />
                 </ComposedChart>
               </ChartContainer>
             </div>
@@ -74,15 +88,28 @@ const Dividends = () => {
                 <ComposedChart data={data}>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="ex_dividend_date" />
-                  <YAxis yAxisId="left" dataKey="amount" domain={['auto', 'auto']} />
+                  <YAxis
+                    yAxisId="left"
+                    dataKey="amount"
+                    domain={['auto', 'auto']}
+                  />
                   <YAxis
                     yAxisId="right"
                     dataKey="growth_percent"
                     orientation="right"
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar yAxisId="left" dataKey="amount" fill="var(--color-lime-400)" />
-                  <Line yAxisId="right" dataKey="growth_percent" connectNulls />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="amount"
+                    fill="var(--color-lime-400)"
+                  />
+                  <Line
+                    yAxisId="right"
+                    dataKey="growth_percent"
+                    name="Growth %"
+                    connectNulls
+                  />
                   <Brush dataKey="ex_dividend_date" height={20} />
                 </ComposedChart>
               </ChartContainer>

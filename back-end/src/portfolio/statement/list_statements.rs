@@ -4,8 +4,9 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
 };
+use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
-use mongodb::bson::{doc, oid::ObjectId};
+use mongodb::bson::doc;
 use serde::Serialize;
 
 use crate::{
@@ -15,26 +16,25 @@ use crate::{
     pagination::{Pagination, PaginationData},
     portfolio::{
         dto,
-        models::{AccountStatement, OpenPosition, PortfolioAccount},
+        models::{AccountStatement, PortfolioAccount},
     },
 };
 
 #[derive(Serialize)]
-pub struct OpenPositionsResponse {
-    pub open_positions: Vec<dto::OpenPosition>,
+pub struct ListStatementsResponse {
+    pub statements: Vec<dto::AccountStatement>,
     pub pagination: PaginationData,
 }
 
 pub async fn handler(
     State(state): State<AppState>,
+    Extension(context): Extension<UserContext>,
     Path(account_id): Path<ObjectId>,
     Query(pagination): Query<Pagination>,
-    Extension(context): Extension<UserContext>,
-) -> AppResult<Json<OpenPositionsResponse>> {
-    let collection = OpenPosition::get_collection(&state)?;
-    let account_collection = PortfolioAccount::get_collection(&state)?;
+) -> AppResult<Json<ListStatementsResponse>> {
+    let collection = AccountStatement::get_collection(&state)?;
 
-    let account = account_collection
+    let account = PortfolioAccount::get_collection(&state)?
         .find_one(doc! {
             "_id": account_id,
             "user_id": context.user_id,
@@ -50,48 +50,27 @@ pub async fn handler(
         );
     }
 
-    let statement = AccountStatement::get_collection(&state)?
-        .find_one(doc! {
-            "account_id": account_id,
-        })
-        .sort(doc! { "end": -1 })
-        .await
-        .context("Failed to get statement for account")?;
-
-    if statement.is_none() {
-        return Ok(Json(OpenPositionsResponse {
-            open_positions: vec![],
-            pagination: PaginationData {
-                total_count: 0,
-                offset: pagination.offset,
-                limit: pagination.limit,
-                has_next: false,
-                has_prev: false,
-            },
-        }));
-    }
-
-    let filter = doc! { "statement_id": statement.unwrap().id };
-
+    let filter = doc! { "account_id": account_id };
     let total_count = collection
         .count_documents(filter.clone())
         .await
-        .context("Failed to count open positions")? as i64;
-    let open_positions = collection
+        .context("Failed to count accounts")? as i64;
+    let statements = collection
         .find(filter)
+        .sort(doc! { "end": -1 })
         .skip(pagination.offset)
         .limit(pagination.limit)
         .await
-        .context("Failed to list open positions")?
+        .context("Failed to list accounts")?
         .try_collect::<Vec<_>>()
         .await
-        .context("Failed to collect open positions")?
+        .context("Failed to collect accounts")?
         .iter()
-        .map(dto::OpenPosition::from)
+        .map(dto::AccountStatement::from)
         .collect();
 
-    Ok(Json(OpenPositionsResponse {
-        open_positions,
+    Ok(Json(ListStatementsResponse {
+        statements,
         pagination: PaginationData {
             total_count,
             offset: pagination.offset,
